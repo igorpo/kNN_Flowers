@@ -8,8 +8,8 @@ import java.util.Scanner;
  * @author Max Scheiber (scheiber), 14fa
  */
 public class FlowerParser {
-	
-	 static Flower[] flwrArray;
+	static double[] maxFtrs = null, minFtrs = null;
+	static Flower[] flwrArray;
 	
 	/**
 	 * In the event of a missing file, print the stack trace and
@@ -33,12 +33,19 @@ public class FlowerParser {
 				double[] features = new double[4];
 				String line = sc.nextLine();
 				String[] feats = line.split("\t");
-				for (int i = 0; i < 4; i++) {
-					features[i] = Double.parseDouble(feats[i]);
+				try {
+					
+					for (int i = 0; i < 4; i++) {
+						features[i] = Double.parseDouble(feats[i]);
+					}
+					label = feats[4];
+					Flower flower = new Flower(features, label);
+					flowers.add(flower);
+				} catch (Exception e) {
+					sc.close();
+					throw new IllegalArgumentException("File Malformed");	
 				}
-				label = feats[4];
-				Flower flower = new Flower(features, label);
-				flowers.add(flower);
+				
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -55,11 +62,14 @@ public class FlowerParser {
 	 * @return array of corresponding maximum feature values
 	 */
 	static double[] findMaxFeatures(Flower[] f) {
+		if (maxFtrs != null) { 
+			return maxFtrs;
+		}
 		double f0 = 0;
 		double f1 = 0;
 		double f2 = 0;
 		double f3 = 0;
-		double[] maxFeatures = new double[4];
+		maxFtrs = new double[4];
 		for (int i = 0; i < f.length; i++) {
 			double[] features = f[i].getFeatures();
 			if (features[0] > f0) {
@@ -75,11 +85,12 @@ public class FlowerParser {
 				f3 = features[3];
 			}
 		}
-		maxFeatures[0] = f0;
-		maxFeatures[1] = f1;
-		maxFeatures[2] = f2;
-		maxFeatures[3] = f3;
-		return maxFeatures;
+		maxFtrs[0] = f0;
+		maxFtrs[1] = f1;
+		maxFtrs[2] = f2;
+		maxFtrs[3] = f3;
+		
+		return maxFtrs;
 	}
 	
 	/**
@@ -88,11 +99,12 @@ public class FlowerParser {
 	 * @return
 	 */
 	static double[] findMinFeatures(Flower[] f) {
+		if (minFtrs != null) return minFtrs;
 		double f0 = Double.POSITIVE_INFINITY;
 		double f1 = Double.POSITIVE_INFINITY;
 		double f2 = Double.POSITIVE_INFINITY;
 		double f3 = Double.POSITIVE_INFINITY;
-		double[] minFeatures = new double[4];
+		minFtrs = new double[4];
 		for (int i = 0; i < f.length; i++) {
 			double[] features = f[i].getFeatures();
 			if (features[0] < f0) {
@@ -108,10 +120,11 @@ public class FlowerParser {
 				f3 = features[3];
 			}
 		}
-		minFeatures[0] = f0;
-		minFeatures[1] = f1;
-		minFeatures[2] = f2;
-		minFeatures[3] = f3;
-		return minFeatures;
+		minFtrs[0] = f0;
+		minFtrs[1] = f1;
+		minFtrs[2] = f2;
+		minFtrs[3] = f3;
+		
+		return minFtrs;
 	}
 }

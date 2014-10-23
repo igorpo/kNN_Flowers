@@ -9,11 +9,10 @@ import java.util.Map;
  */
 public class Flower implements Comparable<Flower> {
 	
-	private double flwr[] = new double[4];
+	public double flwr[] = new double[4];
 	private String flwrClass;
 	private Flower test;
-//	private Flower[] normalized;
-	private BinaryMaxHeap<Flower> b = new BinaryMaxHeap<Flower>(Flower.class);
+	
 	
 	/**
 	 * @param label The flower's species.
@@ -54,24 +53,30 @@ public class Flower implements Comparable<Flower> {
 		if (training == null || training.length == 0 || k <= 0) {
 			throw new IllegalArgumentException();
 		}
-		test = this;
-		Flower[] nf = test.normalize(training); // norm test flwr is nf[0]
+		BinaryMaxHeap<Flower> b = new BinaryMaxHeap<Flower>(Flower.class);
+		if (k > training.length) {
+			k = training.length;
+		}
+		Flower[] nf = this.normalize(training); // norm test flwr is nf[0]
 		
-		test = nf[0];
+		// make each flowers test flower the correct test flower
+		for (int i = 1; i < nf.length; i++) {
+			nf[i].test = this;
+		}
 		
 		for (int i = 1; i <= k; i++) {
-			b.insert(nf[1]);
+			b.insert(nf[i]);
 		}
+		
 		 
 		for (int i = k + 1; i < nf.length; i++) {
-			b.insert(nf[i]);
+			b.insert(nf[i]);	
 			b.removeMax();
 		}
-		
+				
 		Flower[] kClosestNormalized = new Flower[b.size()];
 		// whatever remains must be the k smallest distances
-		
-		for (int i = k - 1; i > 0; i--) {
+		for (int i = k - 1; i >= 0 ; i--) {
 			kClosestNormalized[i] = b.removeMax();
 		}
 		return kClosestNormalized;
@@ -86,7 +91,7 @@ public class Flower implements Comparable<Flower> {
 		HashMap<String, Integer> labelMap = new HashMap<String, Integer>();
 		int highest = 0;
 		String mostUsed = "";
-		for (int i = 0; i < neighbors.length; i++) {
+		for (int i = 1; i < neighbors.length; i++) {
 			if (labelMap.containsKey(neighbors[i].getLabel())) {
 				int n = labelMap.get(neighbors[i].getLabel()) + 1;
 				labelMap.put(neighbors[i].getLabel(), n);
@@ -117,11 +122,19 @@ public class Flower implements Comparable<Flower> {
 	 * Should compare the distance between this and the test point to g and the test point.
 	 */
 	public int compareTo(Flower g) {
-		double gToTest = g.computeEuclidean(test);
-		System.out.println(gToTest);
-		double fToTest = this.computeEuclidean(test);
 		
-		return (int) (fToTest - gToTest);
+		Flower[] n = {test};
+		Flower nTest = test.normalize(n)[0];
+		double gToTest = g.computeEuclidean(nTest);
+		double fToTest = this.computeEuclidean(nTest);
+		
+		if (fToTest > gToTest) {
+			return 1;
+		} else if (fToTest == gToTest) {
+			return 0;
+		} else {
+			return -1;
+		}
 	}
 
 	/**
@@ -143,13 +156,13 @@ public class Flower implements Comparable<Flower> {
 	
 	
 	Flower[] normalize(Flower[] flwrs) {
+//		System.out.println("Training: " + Arrays.toString(flwrs));
 		Flower[] normalized = new Flower[flwrs.length + 1];
 		// max/min features of the training data set
-		double[] maxFtrs = FlowerParser.findMaxFeatures(FlowerParser.flwrArray);
-		double[] minFtrs = FlowerParser.findMinFeatures(FlowerParser.flwrArray);
-		
+		double[] maxFtrs = FlowerParser.findMaxFeatures(flwrs);
+		double[] minFtrs = FlowerParser.findMinFeatures(flwrs);
+
 		double[] thisFeatures = this.getFeatures();
-		
 		// add test flower to normalized data
 		for (int i = 0; i < 4; i++) {
 			if (thisFeatures[i] > maxFtrs[i]) {
@@ -162,7 +175,7 @@ public class Flower implements Comparable<Flower> {
 		// add test flower normalized
 		double[] fNorm = new double[4];
 		for (int i = 0; i < 4; i++) {
-			fNorm[i] = (thisFeatures[i] - minFtrs[i]) / (maxFtrs[i] - minFtrs[i]);
+			fNorm[i] = (thisFeatures[i] - minFtrs[i])/(maxFtrs[i] - minFtrs[i]);
 		}
 		Flower normalizedTestFlwr = new Flower(fNorm, this.getLabel());
 		normalized[0] = normalizedTestFlwr;

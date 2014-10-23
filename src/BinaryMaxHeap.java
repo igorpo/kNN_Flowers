@@ -117,17 +117,27 @@ public class BinaryMaxHeap<E extends Comparable<? super E>>
 	 */
 	void sink(int k) {
 		while (2 * k <= n) {
-			if (2 * k < n && less(2 * k, 2 * k + 1) && less(k, 2 * k + 1)) {
+			if (2 * k < n && less(2 * k, 2 * k + 1)) {
 				swap(k, 2 * k + 1);
 				k = 2 * k + 1;
 			} 
-			else if (2 * k < n && !less(2 * k, 2 * k + 1) && less(k, 2 * k)) {
+			else if (2 * k < n && !less(2 * k, 2 * k + 1)) {
 				swap(k, 2 * k);
 				k = 2 * k;
 			}
-			else break;
-			
+			else break;			
 		}
+//		while (2 * k <= n) {
+//			int j = 2 * k;
+//			if (j < n && less(j, j + 1)) {
+//				j++;
+//			}
+//			if (!less(k, j)) {
+//				break;
+//			}
+//			swap(k, j);
+//			k = j;
+//		}
 	}
 	
 	/**

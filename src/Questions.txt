@@ -1,0 +1,36 @@
+1. Analyze the asymptotic running time of your implementation of 
+k-nearest neighbors.
+
+The k-nearest neighbors algorithm runs in O(n * log(k)). Since I start with a
+max heap of "k" elements, and then continuously manipulate the max heap in 
+place with insertions and removal of max, (which takes logk time) then we 
+have the asymptotic run time as mentioned above. If we had done it by inserting
+all of the elements into the max heap at first, there would be too much 
+overhead, it would give us O(k * log(n) + n). (Linear time to add all elements 
+to maxheap). Thus, generally my method of adding is faster. (It also has space
+complexity O(k) < O(n), generally).
+
+
+2. In terms of running time, why was it a good idea to use a binary max-heap?
+ (Hint: compare your implementation to a hypothetical implementation that 
+ used a normal array instead of a max-heap.)
+ 
+ It is better to use a max heap, because insertion and removal from the heap
+ becomes log(n), while inserting into an array of (and keeping some kind 
+ of rudimentary order) would take linear time in the worst case. Thus, using
+ a binary max heap is better and more efficient in general. 
+ 
+ 3. Under what scenario would it be a poor idea to use the 
+ k-nearest neighbors algorithm?
+ 
+ If our k is very large, the algorithm generally becomes more accurate, but is 
+ computationally more expensive. It also defeats the general purpose of
+ kNN. If k approaches N, then we basically have a general sorting algorithm,
+ except with more overhead, so we may as well sort at that point. 
+ 
+ 4. Would k = n be a good or bad choice of k? Why?
+ If we choose k = n, then we are returning the n closest neighbors, which
+ would simply return the entire training set. This is not good because the 
+ algorithm would turn into a n nlogn + n sorting algorithm with more overhead, 
+ since we would be storing everything into the heap. We may as well use a sort
+ algorithm instead with nlogn time.
